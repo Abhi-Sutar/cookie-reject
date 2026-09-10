@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head><title>Decoy text collision</title></head>
+<body>
+<p>Cookie consent dialog with a per-purpose "View details" link whose
+accessible name legitimately contains the word "save" (a real IAB TCF
+purpose is literally named "Save and communicate privacy choices") &mdash;
+the engine must not mistake that decoy for the real save button.</p>
+
+<div role="dialog" aria-label="Data preferences" style="position:fixed;bottom:0;left:0;right:0;background:#fff;padding:16px;">
+  <button id="manage-btn">Manage options</button>
+  <button id="accept-btn">Accept all</button>
+</div>
+
+<div id="panel" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#eee;padding:20px;">
+  <div><label><input type="checkbox" checked id="analytics"/> Analytics</label></div>
+  <a href="#" role="button" id="decoy" aria-label="View details, Save and communicate privacy choices">View details</a>
+  <button id="save-btn" class="fc-confirm-choices">Confirm choices</button>
+</div>
+
+<script>
+document.getElementById('manage-btn').addEventListener('click', () => {
+  document.getElementById('panel').style.display = 'block';
+});
+document.getElementById('decoy').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.__decoyClicked = true;
+});
+</script>
+</body>
+</html>

@@ -64,6 +64,33 @@ load, so it won't go clicking random buttons elsewhere on a page.
   that one click reject everything rather than requiring you to hunt down
   every legitimate-interest toggle by hand.
 
+## Testing
+
+Automated tests (Playwright) cover the detection/rejection logic against
+mock consent-dialog fixtures, plus manifest sanity checks:
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
+
+This runs 14 tests: direct reject-all handling, the settings-panel +
+legitimate-interest toggle flow (including the hidden-checkbox and
+decoy-text cases that real sites like Google Funding Choices actually hit),
+a known-CMP-rule path, a "does nothing on a normal page" safety check,
+double-injection safety, manifest/file-reference checks, and a true
+end-to-end test that loads the real unpacked extension in an actual browser
+(headed by default — real Chrome's stable channel silently refuses
+`--load-extension`, likely anti-malware hardening, so this uses Playwright's
+bundled Chromium instead, which stays reliable for automation). That test
+skips itself with an explanation rather than reporting a false failure in
+environments where a browser window can't be launched at all (e.g. a
+display-less sandbox).
+
+Re-run `npm test` after any change to `src/engine.js`, `src/rules.js`, or
+`src/keywords.js`, and before every Chrome Web Store submission.
+
 ## Privacy
 
 Everything runs locally in the browser. No network requests are made by the

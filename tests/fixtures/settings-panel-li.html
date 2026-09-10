@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head><title>Settings panel with legitimate interest</title></head>
+<body>
+<p>This site uses cookies and processes some data based on our legitimate interest.</p>
+<div role="dialog" aria-label="Cookie consent" style="position:fixed;bottom:0;left:0;right:0;background:#fff;padding:16px;">
+  <p>No direct reject button here on purpose &mdash; only "Manage preferences".</p>
+  <button id="manage-btn">Manage preferences</button>
+  <button id="accept-btn">Accept all</button>
+</div>
+
+<div id="panel" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#eee;padding:20px;">
+  <h3>Cookie preferences</h3>
+  <div><label><input type="checkbox" checked disabled id="necessary"/> Strictly necessary cookies (always active)</label></div>
+  <div><label><input type="checkbox" checked id="analytics"/> Analytics cookies (consent)</label></div>
+  <div><label><input type="checkbox" checked id="li-marketing"/> Marketing - processed under legitimate interest</label></div>
+  <div role="switch" aria-checked="true" tabindex="0" id="li-switch">Personalization (legitimate interest): ON</div>
+  <button id="save-btn">Save settings</button>
+</div>
+
+<script>
+document.getElementById('manage-btn').addEventListener('click', () => {
+  document.getElementById('panel').style.display = 'block';
+});
+document.getElementById('li-switch').addEventListener('click', function () {
+  const on = this.getAttribute('aria-checked') === 'true';
+  this.setAttribute('aria-checked', on ? 'false' : 'true');
+  this.textContent = 'Personalization (legitimate interest): ' + (on ? 'OFF' : 'ON');
+});
+</script>
+</body>
+</html>

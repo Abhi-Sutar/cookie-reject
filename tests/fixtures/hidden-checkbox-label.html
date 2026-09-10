@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><title>Hidden checkbox with visible label</title></head>
+<body>
+<p>Cookie/data preferences dialog where the real toggle input is visually
+hidden and a styled &lt;label&gt; is what the user actually sees and clicks
+&mdash; the pattern Google Funding Choices uses in production.</p>
+
+<div role="dialog" aria-label="Data preferences" style="position:fixed;bottom:0;left:0;right:0;background:#fff;padding:16px;">
+  <button id="manage-btn">Manage options</button>
+  <button id="accept-btn">Accept all</button>
+</div>
+
+<div id="panel" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#eee;padding:20px;">
+  <label class="slider-container" for="li-toggle" style="display:block;cursor:pointer;">
+    <span>Legitimate interest (12 vendors)</span>
+    <input type="checkbox" id="li-toggle" checked
+      style="position:absolute;opacity:0;width:1px;height:1px;overflow:hidden;" />
+  </label>
+  <button id="save-btn" class="fc-confirm-choices">Confirm choices</button>
+</div>
+
+<script>
+document.getElementById('manage-btn').addEventListener('click', () => {
+  document.getElementById('panel').style.display = 'block';
+});
+</script>
+</body>
+</html>

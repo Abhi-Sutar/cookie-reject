@@ -1,0 +1,23 @@
+{
+  "name": "cookie-reject",
+  "version": "1.0.0",
+  "description": "A Chrome extension that automatically dismisses cookie consent popups by rejecting everything — including \"legitimate interest\" purposes that many sites pre-opt you into and bury inside a settings panel instead of putting on a one-click \"Reject All\" button.",
+  "private": true,
+  "scripts": {
+    "test": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abhi-Sutar/cookie-reject.git"
+  },
+  "keywords": [],
+  "author": "Abhijeet Sutar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Abhi-Sutar/cookie-reject/issues"
+  },
+  "homepage": "https://github.com/Abhi-Sutar/cookie-reject#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
