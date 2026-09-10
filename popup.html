@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reject All Cookies</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon32.png" alt="" width="22" height="22" />
+      <h1>Reject All Cookies</h1>
+    </header>
+
+    <section class="row">
+      <label class="switch-row" for="global-toggle">
+        <span>Auto-reject on all sites</span>
+        <span class="switch">
+          <input type="checkbox" id="global-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+    </section>
+
+    <section class="row">
+      <label class="switch-row" for="site-toggle">
+        <span id="site-label">Disabled on this site</span>
+        <span class="switch">
+          <input type="checkbox" id="site-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+    </section>
+
+    <section class="status" id="status-box">
+      <p id="status-text">Checking this page…</p>
+    </section>
+
+    <section class="row">
+      <button id="reject-now">Reject now</button>
+    </section>
+
+    <footer>
+      <span id="total-count">0</span> consent dialogs auto-rejected so far
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

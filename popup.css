@@ -1,0 +1,155 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1f2933;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #16a34a;
+  --accent-off: #d1d5db;
+  --status-bg: #f0fdf4;
+  --status-fg: #166534;
+  --status-bg-idle: #f3f4f6;
+  --status-fg-idle: #4b5563;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1d21;
+    --fg: #f3f4f6;
+    --muted: #9ca3af;
+    --border: #33373d;
+    --status-bg: #0f2f1c;
+    --status-fg: #4ade80;
+    --status-bg-idle: #26292e;
+    --status-fg-idle: #cbd5e1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  width: 300px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 13px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 8px;
+}
+
+header h1 {
+  font-size: 15px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.row {
+  padding: 8px 16px;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: 12px;
+}
+
+.switch-row > span:first-child {
+  flex: 1;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: var(--accent-off);
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+
+.switch input:checked + .slider {
+  background: var(--accent);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(16px);
+}
+
+.status {
+  margin: 8px 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--status-bg-idle);
+  color: var(--status-fg-idle);
+}
+
+.status.handled {
+  background: var(--status-bg);
+  color: var(--status-fg);
+}
+
+.status p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+button#reject-now {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button#reject-now:hover {
+  border-color: var(--accent);
+}
+
+button#reject-now:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+footer {
+  padding: 10px 16px 14px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
