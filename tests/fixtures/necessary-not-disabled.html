@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><title>Necessary toggle not DOM-disabled</title></head>
+<body>
+<p>Cookie consent dialog where the "necessary" toggle is checked and NOT
+marked disabled at the DOM level (some sites don't bother) — only its label
+wording says it's required. Regression test for a bug where checkbox
+<input>'s default .value ("on") was polluting the label text lookup used
+for the keyword check, making this kind of toggle indistinguishable from
+any other and letting it get switched off.</p>
+
+<div role="dialog" aria-label="Cookie consent" style="position:fixed;bottom:0;left:0;right:0;background:#fff;padding:16px;">
+  <button id="manage-btn">Manage preferences</button>
+  <button id="accept-btn">Accept all</button>
+</div>
+
+<div id="panel" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#eee;padding:20px;">
+  <div><label><input type="checkbox" checked id="necessary"/> Strictly necessary — required for the site to function</label></div>
+  <div><label><input type="checkbox" checked id="analytics"/> Analytics cookies</label></div>
+  <button id="save-btn">Save settings</button>
+</div>
+
+<script>
+document.getElementById('manage-btn').addEventListener('click', () => {
+  document.getElementById('panel').style.display = 'block';
+});
+</script>
+</body>
+</html>

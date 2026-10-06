@@ -16,6 +16,12 @@
   let handledThisPage = false;
   let observer = null;
   let stopTimer = null;
+  // Local-testing aid only (off by default, storage-backed — see popup's
+  // collapsed "Debug" section). When on, toggleAllOffInPanel reports one row
+  // per toggle candidate to background.js, which accumulates them and, if
+  // the optional "downloads" permission has been granted, writes them to a
+  // real CSV file. Never transmitted anywhere; see PRIVACY.md.
+  let debugToggleLogEnabled = false;
 
   // ---------- small utils ----------
 
@@ -104,9 +110,14 @@
   }
 
   function elementText(el) {
-    return normalizeText(
-      el.getAttribute("aria-label") || el.innerText || el.textContent || el.value || ""
-    );
+    // .value is only meaningful display text for button-like inputs
+    // (type="button"/"submit", where it IS the visible label). For a
+    // checkbox/radio, an unset .value defaults to the literal string "on"
+    // per the HTML spec — using it here would make nearbyText() return
+    // "on" for every checkbox instead of walking up to the real label.
+    const isCheckable = el.type === "checkbox" || el.type === "radio";
+    const value = isCheckable ? "" : el.value;
+    return normalizeText(el.getAttribute("aria-label") || el.innerText || el.textContent || value || "");
   }
 
   function fireClick(el) {
@@ -249,18 +260,71 @@
   // what covers CMPs that pre-opt users into "legitimate interest" purposes
   // with no top-level reject-all button — those are just additional switches
   // in the settings panel, same as any other purpose toggle.
-  function toggleAllOffInPanel(root) {
+  //
+  // `cmpName` is only for the optional debug log (which CMP/path was active).
+  function toggleAllOffInPanel(root, cmpName) {
     const toggles = deepQueryAll('input[type="checkbox"], [role="switch"]', root);
     let toggledCount = 0;
+    const debugRows = debugToggleLogEnabled ? [] : null;
+
     for (const el of toggles) {
-      if (isDisabled(el) || !toggleIsReachable(el)) continue;
+      const domDisabled = isDisabled(el);
+      const reachable = toggleIsReachable(el);
+
+      if (debugRows) {
+        // Compute both checks independently, regardless of which one would
+        // short-circuit the real skip logic below — that's the whole point
+        // of the log (comparing how often each actually fires/agrees).
+        const wasOn = toggleIsOn(el);
+        const label = nearbyText(el);
+        const matchedKeyword = matchesAny(label, KW.necessary);
+        const finalAction = domDisabled
+          ? "skipped-disabled"
+          : !reachable
+          ? "skipped-unreachable"
+          : !wasOn
+          ? "skipped-already-off"
+          : matchedKeyword
+          ? "skipped-keyword"
+          : "toggled-off";
+        debugRows.push({
+          timestamp: new Date().toISOString(),
+          host: location.hostname,
+          cmp: cmpName || "",
+          tag: el.tagName,
+          id: el.id || "",
+          classes: (el.className || "").toString().slice(0, 80),
+          label: label.slice(0, 80),
+          wasOn,
+          domDisabled,
+          reachable,
+          keywordMatch: !!matchedKeyword,
+          matchedKeyword: matchedKeyword || "",
+          finalAction,
+        });
+      }
+
+      if (domDisabled || !reachable) continue;
       if (!toggleIsOn(el)) continue;
       const label = nearbyText(el);
       if (matchesAny(label, KW.necessary)) continue;
       turnOffToggle(el);
       toggledCount++;
     }
+
+    if (debugRows && debugRows.length) {
+      reportDebugRows(debugRows);
+    }
+
     return toggledCount;
+  }
+
+  function reportDebugRows(rows) {
+    try {
+      chrome.runtime.sendMessage({ type: "cookie-reject:debug-rows", rows });
+    } catch (e) {
+      /* extension context may be gone during navigation; ignore */
+    }
   }
 
   // ---------- per-CMP rule execution ----------
@@ -303,7 +367,7 @@
       return { method: "settings-reject-all" };
     }
 
-    const toggledCount = toggleAllOffInPanel(panelRoot);
+    const toggledCount = toggleAllOffInPanel(panelRoot, rule.name);
 
     let saveBtn = rule.save ? clickFirstMatch(rule.save, panelRoot) : null;
     if (!saveBtn) {
@@ -375,7 +439,7 @@
       return { cmp: "Generic", method: "settings-reject-all" };
     }
 
-    const toggledCount = toggleAllOffInPanel(document);
+    const toggledCount = toggleAllOffInPanel(document, "Generic");
     const saveBtn = genericFind(document, KW.save, false);
     if (saveBtn) {
       fireClick(saveBtn);
@@ -424,12 +488,17 @@
   async function init() {
     let settings;
     try {
-      settings = await chrome.storage.local.get({ enabled: true, disabledSites: [] });
+      settings = await chrome.storage.local.get({
+        enabled: true,
+        disabledSites: [],
+        debugToggleLog: false,
+      });
     } catch (e) {
       return; // extension context not available (e.g. during reload)
     }
     if (!settings.enabled) return;
     if (settings.disabledSites.includes(location.hostname)) return;
+    debugToggleLogEnabled = settings.debugToggleLog;
 
     scan();
 

@@ -7,6 +7,11 @@ const statusBox = document.getElementById("status-box");
 const statusText = document.getElementById("status-text");
 const rejectNowBtn = document.getElementById("reject-now");
 const totalCountEl = document.getElementById("total-count");
+const debugToggle = document.getElementById("debug-toggle");
+const debugStatus = document.getElementById("debug-status");
+const debugClearBtn = document.getElementById("debug-clear");
+
+const DEBUG_LOG_KEY = "__debugToggleLog";
 
 let activeTab = null;
 let hostname = null;
@@ -104,4 +109,59 @@ rejectNowBtn.addEventListener("click", async () => {
   setTimeout(refresh, 800);
 });
 
+// ---------- debug section (local testing only, see engine.js/background.js) ----------
+
+async function refreshDebugSection() {
+  const [{ debugToggleLog = false }, { [DEBUG_LOG_KEY]: rows = [] }, hasDownloads] =
+    await Promise.all([
+      chrome.storage.local.get({ debugToggleLog: false }),
+      chrome.storage.local.get({ [DEBUG_LOG_KEY]: [] }),
+      chrome.permissions.contains({ permissions: ["downloads"] }),
+    ]);
+
+  debugToggle.checked = debugToggleLog;
+  debugClearBtn.hidden = rows.length === 0;
+
+  if (!debugToggleLog) {
+    debugStatus.textContent = "Off — no toggle data is recorded.";
+  } else if (!hasDownloads) {
+    debugStatus.textContent = `On, ${rows.length} row(s) buffered. Downloads permission not granted, so nothing is written to disk yet.`;
+  } else {
+    debugStatus.textContent = `On, ${rows.length} row(s) logged. Writing to "cookie-reject-toggle-log.csv" in your configured download location (chrome://settings/downloads — point it at this repo's folder to keep the file there).`;
+  }
+}
+
+debugToggle.addEventListener("change", async () => {
+  const enabling = debugToggle.checked;
+  if (enabling) {
+    // Must be called directly from this user-gesture handler, before any
+    // other awaits, or Chrome may reject it as not gesture-initiated.
+    let granted = false;
+    try {
+      granted = await chrome.permissions.request({ permissions: ["downloads"] });
+    } catch (e) {
+      granted = false;
+    }
+    if (!granted) {
+      // Still enable logging to chrome.storage.local — just no CSV file
+      // until the permission is granted (can retry by re-checking the box).
+    }
+  } else {
+    try {
+      await chrome.permissions.remove({ permissions: ["downloads"] });
+    } catch (e) {
+      /* ignore */
+    }
+  }
+  await chrome.storage.local.set({ debugToggleLog: enabling });
+  refreshDebugSection();
+});
+
+debugClearBtn.addEventListener("click", async () => {
+  await chrome.storage.local.set({ [DEBUG_LOG_KEY]: [] });
+  debugStatus.textContent += " (Log cleared — delete the old CSV file yourself if you want a clean slate; the extension can't delete files it downloaded.)";
+  refreshDebugSection();
+});
+
 refresh();
+refreshDebugSection();

@@ -91,6 +91,28 @@ display-less sandbox).
 Re-run `npm test` after any change to `src/engine.js`, `src/rules.js`, or
 `src/keywords.js`, and before every Chrome Web Store submission.
 
+## Development / debugging
+
+`toggleAllOffInPanel` in `src/engine.js` decides whether to leave a toggle
+alone via two independent checks: whether it's DOM-`disabled`, and whether
+its nearby label text matches the `necessary` keyword list. To compare how
+each performs across real sites, the popup has a collapsed **Debug (local
+testing)** section (off by default, never shown to regular users beyond an
+empty collapsed disclosure). Turning it on:
+
+- Logs one row per toggle (host, label, both checks' results independently,
+  and the final action taken) to the extension's local storage.
+- Prompts for the optional `downloads` permission (declared in
+  `manifest.json` as `optional_permissions`, so it's never requested or
+  listed for anyone who doesn't turn this on) and, once granted, writes/
+  overwrites a real `cookie-reject-toggle-log.csv` file via
+  `chrome.downloads.download()` — a real file survives any in-browser data
+  clearing, unlike `chrome.storage`. Point Chrome's default download
+  location (`chrome://settings/downloads`) at this repo's folder to keep
+  the file there.
+
+Nothing here is ever transmitted anywhere — see `PRIVACY.md`.
+
 ## Privacy
 
 Everything runs locally in the browser. No network requests are made by the

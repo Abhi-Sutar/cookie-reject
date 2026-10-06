@@ -43,6 +43,19 @@
       <span id="total-count">0</span> consent dialogs auto-rejected so far
     </footer>
 
+    <details class="debug">
+      <summary>Debug (local testing)</summary>
+      <label class="switch-row" for="debug-toggle">
+        <span>Log DOM-disabled vs. keyword checks</span>
+        <span class="switch">
+          <input type="checkbox" id="debug-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+      <p class="debug-status" id="debug-status"></p>
+      <button id="debug-clear" hidden>Clear log</button>
+    </details>
+
     <script src="popup.js"></script>
   </body>
 </html>

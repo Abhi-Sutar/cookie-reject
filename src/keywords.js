@@ -14,7 +14,7 @@ window.__CR_KEYWORDS = {
     "refuse cookies", "reject cookies", "decline cookies",
     "reject", "decline", "refuse",
     // German
-    "alle ablehnen", "nur notwendige", "nur erforderliche", "ablehnen",
+    "alle ablehnen", "alles ablehnen", "nur notwendige", "nur erforderliche", "ablehnen",
     // French
     "tout refuser", "refuser tout", "continuer sans accepter", "refuser",
     // Spanish
@@ -35,7 +35,7 @@ window.__CR_KEYWORDS = {
   // list to disambiguate buttons whose visible text is ambiguous.
   accept: [
     "accept all", "allow all", "agree", "i accept", "i agree",
-    "alle akzeptieren", "tout accepter", "aceptar todo", "accetta tutto",
+    "alle akzeptieren", "akzeptiere alle", "tout accepter", "aceptar todo", "accetta tutto",
     "alles accepteren", "aceitar tudo", "zaakceptuj wszystkie",
   ],
 
@@ -61,8 +61,8 @@ window.__CR_KEYWORDS = {
   save: [
     "save settings", "save preferences", "save & exit", "save and exit",
     "save choices", "confirm choices", "confirm my choices", "confirm",
-    "apply", "submit preferences", "save", "done", "close",
-    "bestätigen", "speichern", "auswahl bestätigen",
+    "apply", "submit preferences", "save", "done", "close", "safe exit",
+    "bestätigen", "speichern", "auswahl bestätigen", "sicherer ausgang",
     "confirmer", "enregistrer", "valider",
     "confirmar", "guardar", "conferma", "salva", "opslaan", "bevestigen",
     "zapisz",
