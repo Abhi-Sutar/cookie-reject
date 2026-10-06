@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head><title>Localized (German) "Sicherer Ausgang" save button</title></head>
+<body>
+<p>Cookie/consent dialog modeled on the real jsonformatter.org Sourcepoint
+panel: no reject-all shortcut anywhere, only per-purpose toggles plus three
+footer buttons — "Zurück" (Back, must not be treated as save), "Sicherer
+Ausgang" (Sourcepoint's own "save this selection and close" term, not
+originally in KW.save), and "Akzeptiere Alle" (Accept All, must never be
+clicked). Regression test for the missing KW.save entry that left the
+engine stuck: toggles got switched off correctly but nothing then closed
+the panel.</p>
+
+<div role="dialog" aria-label="Cookie-Zustimmung" style="position:fixed;bottom:0;left:0;right:0;background:#fff;padding:16px;">
+  <button id="accept-btn">Zustimmen</button>
+  <button id="manage-btn">Meine Auswahl verwalten</button>
+</div>
+
+<div id="panel" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#eee;padding:20px;">
+  <div><label><input type="checkbox" checked disabled id="necessary"/> Erforderliche Speicherung (immer aktiv)</label></div>
+  <div><label><input type="checkbox" checked id="analytics"/> Analytics-Speicher</label></div>
+  <div>
+    <button id="back-btn">Zurück</button>
+    <button id="safe-exit-btn">Sicherer Ausgang</button>
+    <button id="accept-all-btn">Akzeptiere Alle</button>
+  </div>
+</div>
+
+<script>
+document.getElementById('manage-btn').addEventListener('click', () => {
+  document.getElementById('panel').style.display = 'block';
+});
+document.getElementById('back-btn').addEventListener('click', () => {
+  window.__backClicked = true;
+});
+</script>
+</body>
+</html>

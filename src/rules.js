@@ -99,6 +99,7 @@ window.__CR_RULES = [
     detect: "#sp_message_container, .message-container, [class*='sp_choice_type']",
     rejectAll: [
       ".sp_choice_type_REJECT_ALL",
+      ".sp_choice_type_13",
       'button[title="Reject All"]',
       'button[aria-label="Reject All"]',
     ],

@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><title>Localized (German) in-panel reject-all</title></head>
+<body>
+<p>Cookie/consent dialog modeled on a real German-localized Sourcepoint
+render: no plain-matching reject option at the top level, but opening
+"Meine Auswahl verwalten" reveals a mini reject-all labeled "Alles
+ablehnen" — the German-inflected form ("Alle ablehnen" + "s"), which is
+a different string than the uninflected "alle ablehnen" already in
+KW.reject. Regression test for that gap.</p>
+
+<div role="dialog" aria-label="Cookie-Zustimmung" style="position:fixed;bottom:0;left:0;right:0;background:#fff;padding:16px;">
+  <button id="accept-btn">Zustimmen</button>
+  <button id="manage-btn">Meine Auswahl verwalten</button>
+</div>
+
+<div id="panel" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#eee;padding:20px;">
+  <button id="panel-reject-all">Alles ablehnen</button>
+  <button id="panel-accept-all">Akzeptiere Alle</button>
+  <div><label><input type="checkbox" checked id="analytics"/> Analytics-Speicher</label></div>
+</div>
+
+<script>
+document.getElementById('manage-btn').addEventListener('click', () => {
+  document.getElementById('panel').style.display = 'block';
+});
+</script>
+</body>
+</html>

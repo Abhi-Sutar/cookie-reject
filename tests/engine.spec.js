@@ -62,6 +62,30 @@ test("settings panel: legitimate-interest toggles (checkbox + switch) are switch
   expect(clickLog.some((c) => c.id === "save-btn")).toBe(true);
 });
 
+test("a 'necessary' checkbox that ISN'T DOM-disabled is still protected by the keyword check", async ({
+  page,
+}) => {
+  // Regression test: elementText() used to fall through to el.value for
+  // any element, and an unvalued checkbox's .value defaults to the literal
+  // string "on" per the HTML spec — so nearbyText() returned "on" instead
+  // of walking up to the real label, silently breaking the KW.necessary
+  // keyword match for every checkbox-style toggle not also DOM-disabled.
+  await installTestHooks(page);
+  await page.goto(fixture("necessary-not-disabled.html"));
+  await injectEngine(page);
+
+  await waitForReport(page);
+
+  const state = await page.evaluate(() => ({
+    necessary: document.getElementById("necessary").checked,
+    analytics: document.getElementById("analytics").checked,
+  }));
+  expect(state).toEqual({
+    necessary: true, // protected by the keyword match alone, not disabled=true
+    analytics: false,
+  });
+});
+
 test("toggle whose real <input> is visually hidden but whose <label> is visible still gets switched off", async ({
   page,
 }) => {
@@ -95,6 +119,51 @@ test("decoy 'View details' link containing a save keyword is never clicked; the 
   const clickLog = await page.evaluate(() => window.__clickLog);
   expect(clickLog.some((c) => c.id === "decoy")).toBe(false);
   expect(clickLog.some((c) => c.classes === "fc-confirm-choices")).toBe(true);
+});
+
+test("German inflected 'Alles ablehnen' (vs. uninflected 'alle ablehnen') is recognized as an in-panel reject-all", async ({
+  page,
+}) => {
+  // Regression test for jsonformatter.org: real site's panel used "Alles
+  // ablehnen" (grammatically inflected), which the pre-fix KW.reject list
+  // (only "alle ablehnen") didn't match as a substring.
+  await installTestHooks(page);
+  await page.goto(fixture("localized-reject-in-panel.html"));
+  await injectEngine(page);
+
+  const reports = await waitForReport(page);
+  expect(reports[0].method).toBe("settings-reject-all");
+
+  const clickLog = await page.evaluate(() => window.__clickLog);
+  expect(clickLog.some((c) => c.id === "panel-reject-all")).toBe(true);
+  expect(clickLog.some((c) => c.id === "panel-accept-all")).toBe(false);
+  expect(clickLog.some((c) => c.id === "accept-btn")).toBe(false);
+});
+
+test("German 'Sicherer Ausgang' (Sourcepoint's own save/close term) is recognized as the save button", async ({
+  page,
+}) => {
+  // Regression test for jsonformatter.org: with no in-panel reject-all
+  // shortcut, the engine correctly toggled everything off but — before this
+  // fix — never found a save button ("Sicherer Ausgang" wasn't in KW.save),
+  // leaving the panel open. "Zurück" (Back) must not be mistaken for save.
+  await installTestHooks(page);
+  await page.goto(fixture("localized-safe-exit-save.html"));
+  await injectEngine(page);
+
+  const reports = await waitForReport(page);
+  expect(reports[0].method).toBe("toggled-off+saved");
+
+  const state = await page.evaluate(() => ({
+    necessary: document.getElementById("necessary").checked,
+    analytics: document.getElementById("analytics").checked,
+    backClicked: !!window.__backClicked,
+  }));
+  expect(state).toEqual({ necessary: true, analytics: false, backClicked: false });
+
+  const clickLog = await page.evaluate(() => window.__clickLog);
+  expect(clickLog.some((c) => c.id === "safe-exit-btn")).toBe(true);
+  expect(clickLog.some((c) => c.id === "accept-all-btn")).toBe(false);
 });
 
 test("known CMP rule (mock OneTrust) uses its direct selector-based reject button over generic matching", async ({

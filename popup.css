@@ -127,7 +127,8 @@ header h1 {
   line-height: 1.4;
 }
 
-button#reject-now {
+button#reject-now,
+button#debug-clear {
   width: 100%;
   padding: 8px 10px;
   border-radius: 8px;
@@ -138,11 +139,13 @@ button#reject-now {
   cursor: pointer;
 }
 
-button#reject-now:hover {
+button#reject-now:hover,
+button#debug-clear:hover {
   border-color: var(--accent);
 }
 
-button#reject-now:disabled {
+button#reject-now:disabled,
+button#debug-clear:disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -152,4 +155,32 @@ footer {
   color: var(--muted);
   border-top: 1px solid var(--border);
   margin-top: 4px;
+}
+
+.debug {
+  margin: 0 16px 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.debug summary {
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.debug .switch-row {
+  padding: 0;
+}
+
+.debug-status {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.debug button#debug-clear {
+  margin-top: 6px;
 }
